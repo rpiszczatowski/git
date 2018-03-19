@@ -418,6 +418,16 @@ all::
 #
 # Define HAVE_BSD_SYSCTL if your platform has a BSD-compatible sysctl function.
 #
+# Define HAVE_BSD_KERN_PROC_SYSCTL if your platform supports the KERN_PROC BSD
+# sysctl function.
+#
+# Define PROCFS_EXECUTABLE_PATH if your platform mounts a "procfs" filesystem
+# capable of resolving the path of the current executable. If defined, this
+# must be the canonical path for the "procfs" current executable path.
+#
+# Define HAVE_NS_GET_EXECUTABLE_PATH if your platform supports calling
+# _NSGetExecutablePath to retrieve the path of the running executable.
+#
 # Define HAVE_GETDELIM if your system has the getdelim() function.
 #
 # Define PAGER_ENV to a SP separated VAR=VAL pairs to define
@@ -1664,8 +1674,21 @@ ifdef HAVE_BSD_SYSCTL
 	BASIC_CFLAGS += -DHAVE_BSD_SYSCTL
 endif
 
+ifdef HAVE_BSD_KERN_PROC_SYSCTL
+	BASIC_CFLAGS += -DHAVE_BSD_KERN_PROC_SYSCTL
+endif
+
 ifdef HAVE_GETDELIM
 	BASIC_CFLAGS += -DHAVE_GETDELIM
+endif
+
+ifneq ($(PROCFS_EXECUTABLE_PATH),)
+	procfs_executable_path_SQ = $(subst ','\'',$(PROCFS_EXECUTABLE_PATH))
+	BASIC_CFLAGS += '-DPROCFS_EXECUTABLE_PATH="$(procfs_executable_path_SQ)"'
+endif
+
+ifdef HAVE_NS_GET_EXECUTABLE_PATH
+	BASIC_CFLAGS += -DHAVE_NS_GET_EXECUTABLE_PATH
 endif
 
 ifeq ($(TCLTK_PATH),)
@@ -2216,6 +2239,7 @@ endif
 exec_cmd.sp exec_cmd.s exec_cmd.o: GIT-PREFIX
 exec_cmd.sp exec_cmd.s exec_cmd.o: EXTRA_CPPFLAGS = \
 	'-DGIT_EXEC_PATH="$(gitexecdir_SQ)"' \
+	'-DGIT_LOCALE_PATH="$(localedir_relative_SQ)"' \
 	'-DBINDIR="$(bindir_relative_SQ)"' \
 	'-DPREFIX="$(prefix_SQ)"'
 
@@ -2233,7 +2257,7 @@ attr.sp attr.s attr.o: EXTRA_CPPFLAGS = \
 
 gettext.sp gettext.s gettext.o: GIT-PREFIX
 gettext.sp gettext.s gettext.o: EXTRA_CPPFLAGS = \
-	-DGIT_LOCALE_PATH='"$(localedir_SQ)"'
+	-DGIT_LOCALE_PATH='"$(localedir_relative_SQ)"'
 
 http-push.sp http.sp http-walker.sp remote-curl.sp imap-send.sp: SPARSE_FLAGS += \
 	-DCURL_DISABLE_TYPECHECK
