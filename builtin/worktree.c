@@ -321,7 +321,7 @@ static int add_worktree(const char *path, const char *refname,
 		fprintf(stderr, _("creating branch '%s'"), opts->new_branch);
 
 	fprintf(stderr, _("worktree HEAD is now at %s"),
-		find_unique_abbrev(commit->object.oid.hash, DEFAULT_ABBREV));
+		find_unique_abbrev(&commit->object.oid, DEFAULT_ABBREV));
 
 	strbuf_reset(&sb);
 	pp_commit_easy(CMIT_FMT_ONELINE, commit, &sb);
