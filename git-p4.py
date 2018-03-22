@@ -3393,7 +3393,10 @@ class P4Sync(Command, P4UserMap):
                                     i = i - 1
                                     break
 
-                            paths.append ("/".join(cur_list[:i + 1]))
+                            path ="/".join(cur_list[:i + 1])
+                            if path == "/":
+                                path = "//"
+                            paths.append (path)
 
                         self.previousDepotPaths = paths
 
